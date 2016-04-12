@@ -23,11 +23,16 @@ Godel: Austrian logician and mathematician http://en.wikipedia.org/wiki/Kurt_G%C
   
 ### Application can work at two modes:
 -  Local mode
-  -  All the ROS nodes run at the same machine.
+  -  All the functions run at the same machine.
 -  Network mode
-  -  ROS nodes run at two different machine: Server and Client.
-  -  Client runs ROS nodes "RVIZ" and "point_cloud_generator_node".
-  -  Server runs all other ROS nodes except two nodes running on client.
+  -  Functions are distributed to two different machine: Server and Client.
+  -  Server Machine:
+    -  Runs perceptions nodes such as surface detection
+    -  Runs motion planning nodes such as the process path planner and free motion planner (moveit).
+  -  Client Machine:
+    -  Runs Rviz for user front-end and visualization only.
+    -  Runs either industrial_robot_simulator node or robot_driver node depending on whether it is on sim or real mode.
+    -  Runs either generate_point_cloud node or Kinect sensor driver node also based on the mode being used.
 
   Note: One server can support multiple clients.
     
@@ -59,7 +64,7 @@ Godel: Austrian logician and mathematician http://en.wikipedia.org/wiki/Kurt_G%C
   roslaunch godel_surface_detection kinect2.launch
   ```
 
-### Network mode(Only simulation)
+### Network mode
 - Run blending demo in full simulation mode (simulated robot and sensor)
   
   Server: 
@@ -80,7 +85,7 @@ Godel: Austrian logician and mathematician http://en.wikipedia.org/wiki/Kurt_G%C
   ```
   rosrun godel_network irb2400_client.sh [server ip] [robot namespace] true
   ```
-  Note:Robot namespce is the identity of individual robot, can't be the same.
+  Note:Robot namespace is the identity of individual robot, they can't be the same.
   
   
   

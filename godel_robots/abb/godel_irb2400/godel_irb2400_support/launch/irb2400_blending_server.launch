@@ -23,12 +23,14 @@
     <node name="scan_process_execution" pkg="godel_process_execution" type="keyence_process_service_node"/>
   </group>
 
-  <!-- Bring up simulated robot that can be visualized under the tf namespace 'simulation'
+  <!-- Bring up simulated robot that can be visualized under the tf namespace 
        Allows for previewing paths generated before execution. -->
-  <include file="$(find industrial_robot_simulator_service)/launch/start_simulation_server.launch" > <arg name="namespace" value="$(arg namespace)"/>
+  <include file="$(find industrial_robot_simulator_service)/launch/start_simulation_server.launch" > 
+    <arg name="namespace" value="$(arg namespace)"/>
   </include>
   
-  <!-- Brings up the core blending service: this includes the tool path planners for both the blender and the laser scanner. --> <include file="$(find godel_surface_detection)/launch/godel_core.launch"  ns="$(arg namespace)">
+  <!-- Brings up the core blending service: this includes the tool path planners for both the blender and the laser scanner. --> 
+  <include file="$(find godel_surface_detection)/launch/godel_core.launch"  ns="$(arg namespace)">
     <arg name="config_path" value="$(find godel_irb2400_support)/config"/>
   </include>
 

@@ -23,13 +23,13 @@ const static int MAX_SERVICECALL_FAILURE = 20;
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "robot_auto_blending");
-  ros::NodeHandle nh;
+  ros::NodeHandle node_handle;
   ros::Rate loop_rate(10);
 
   godel_msgs::SurfaceBlendingParameters param_srv;
-  godel_msgs::SurfaceDetection surfacedetection_srv;
-  godel_msgs::SelectSurface::Request req;
-  godel_msgs::SelectSurface::Response res;
+  godel_msgs::SurfaceDetection surfaceDetection_srv;
+  godel_msgs::SelectSurface::Request selectSurface_req;
+  godel_msgs::SelectSurface::Response selectSurface_res;
   godel_msgs::ProcessPlanning process_plan;
   godel_msgs::GetAvailableMotionPlans motionQuery_srv;
   godel_msgs::SelectMotionPlan motion_srv;
@@ -37,48 +37,52 @@ int main(int argc, char** argv)
   int serviceCall_failure = 0;
 
   //ServiceClient
-  ros::ServiceClient param_client = nh.serviceClient<godel_msgs::SurfaceBlendingParameters>(
+  ros::ServiceClient param_client = node_handle.serviceClient<godel_msgs::SurfaceBlendingParameters>(
       SURFACE_BLENDING_PARAMETERS);
-  ros::ServiceClient select_surface_client_ = nh.serviceClient<godel_msgs::SelectSurface>(SELECT_SURFACE_SERVICE);
-  ros::ServiceClient process_plan_client_ = nh.serviceClient<godel_msgs::ProcessPlanning>(PROCESS_PATH_SERVICE);
-  ros::ServiceClient surface_client_ = nh.serviceClient<godel_msgs::SurfaceDetection>(SURFACE_DETECTION_SERVICE);
-  ros::ServiceClient get_motion_plans_client_ = nh.serviceClient<godel_msgs::GetAvailableMotionPlans>(
+  ros::ServiceClient select_surface_client_ = node_handle.serviceClient<godel_msgs::SelectSurface>(
+      SELECT_SURFACE_SERVICE);
+  ros::ServiceClient process_plan_client_ = node_handle.serviceClient<godel_msgs::ProcessPlanning>(
+      PROCESS_PATH_SERVICE);
+  ros::ServiceClient surface_client_ = node_handle.serviceClient<godel_msgs::SurfaceDetection>(
+      SURFACE_DETECTION_SERVICE);
+  ros::ServiceClient get_motion_plans_client_ = node_handle.serviceClient<godel_msgs::GetAvailableMotionPlans>(
       GET_AVAILABLE_MOTION_PLANS_SERVICE);
-  ros::ServiceClient sim_client_ = nh.serviceClient<godel_msgs::SelectMotionPlan>(SELECT_MOTION_PLAN_SERVICE);
+  ros::ServiceClient sim_client_ = node_handle.serviceClient<godel_msgs::SelectMotionPlan>(SELECT_MOTION_PLAN_SERVICE);
 
   while (ros::ok())
   {
-    if (serviceCall_failure > MAX_SERVICECALL_FAILURE )
+    if (serviceCall_failure > MAX_SERVICECALL_FAILURE)
     {
       ROS_ERROR_STREAM("Service Call failures exceed the MAX_SERVICECALL_FAILURE");
       return -1;
     }
+
     //Get parameters for surface detection
     param_srv.request.action = param_srv.request.GET_CURRENT_PARAMETERS;
     if (!param_client.call(param_srv))
     {
-      ROS_WARN_STREAM("Unable to call surface_blending_parameters service");
+      ROS_WARN_STREAM("Unable to call the "<<SURFACE_BLENDING_PARAMETERS<<" service");
       serviceCall_failure++;
       continue;
     }
 
     //Scan and detect surface
-    surfacedetection_srv.request.action = 3;
-    surfacedetection_srv.request.use_default_parameters = false;
-    surfacedetection_srv.request.robot_scan = param_srv.response.robot_scan;
-    surfacedetection_srv.request.surface_detection = param_srv.response.surface_detection;
-    if (!surface_client_.call(surfacedetection_srv))
+    surfaceDetection_srv.request.action = 3;
+    surfaceDetection_srv.request.use_default_parameters = false;
+    surfaceDetection_srv.request.robot_scan = param_srv.response.robot_scan;
+    surfaceDetection_srv.request.surface_detection = param_srv.response.surface_detection;
+    if (!surface_client_.call(surfaceDetection_srv))
     {
-      ROS_WARN_STREAM("Unable to call surface detection service");
+      ROS_WARN_STREAM("Unable to call the "<<SURFACE_DETECTION_SERVICE<<" service");
       serviceCall_failure++;
       continue;
     }
 
     //Select all surface
-    req.action = req.SELECT_ALL;
-    if (!select_surface_client_.call(req, res))
+    selectSurface_req.action = selectSurface_req.SELECT_ALL;
+    if (!select_surface_client_.call(selectSurface_req, selectSurface_res))
     {
-      ROS_WARN_STREAM("Unable to call select_surface service");
+      ROS_WARN_STREAM("Unable to call the "<<SELECT_SURFACE_SERVICE<<" service");
       serviceCall_failure++;
       continue;
     }
@@ -90,13 +94,14 @@ int main(int argc, char** argv)
     process_plan.request.action = 2;
     if (!process_plan_client_.call(process_plan))
     {
-      ROS_WARN_STREAM("Unable to call process_path service");
+      ROS_WARN_STREAM("Unable to call the "<<PROCESS_PATH_SERVICE<<" service");
       serviceCall_failure++;
       continue;
     }
+
     if (!get_motion_plans_client_.call(motionQuery_srv))
     {
-      ROS_WARN_STREAM("Unable to call get_available_motion_plans service'");
+      ROS_WARN_STREAM("Unable to call the "<<GET_AVAILABLE_MOTION_PLANS_SERVICE<<" service");
       serviceCall_failure++;
       continue;
     }
@@ -110,7 +115,7 @@ int main(int argc, char** argv)
       motion_srv.request.wait_for_execution = true;
       if (!sim_client_.call(motion_srv))
       {
-        ROS_WARN_STREAM("Unable to call select_motion_plan service");
+        ROS_WARN_STREAM("Unable to call the "<<SELECT_MOTION_PLAN_SERVICE<<" service");
         serviceCall_failure++;
         continue;
       }

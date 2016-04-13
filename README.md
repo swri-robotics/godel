@@ -25,17 +25,17 @@ Godel: Austrian logician and mathematician http://en.wikipedia.org/wiki/Kurt_G%C
 -  Local mode
   -  All the functions run at the same machine.
 -  Network mode
-  -  Functions are distributed to two different machine: Server and Client.
+  -  Functions are distributed to two different machines: Server and Client.
   -  Server Machine:
-    -  Runs perceptions nodes such as surface detection
+    -  Runs perceptions nodes such as surface detection.
     -  Runs motion planning nodes such as the process path planner and free motion planner (moveit).
   -  Client Machine:
     -  Runs Rviz for user front-end and visualization only.
-    -  Runs either industrial_robot_simulator node or robot_driver node depending on whether it is on sim or real mode.
-    -  Runs either generate_point_cloud node or Kinect sensor driver node also based on the mode being used.
+    -  Runs industrial_robot_simulator node when simulated robot is being used.
+    -  Runs robot_driver node when real robot is being used.
+    -  Runs generate_point_cloud node when simulated sensor is being used.
+    -  Runs Kinect sensor driver node when real sensor is being used. 
 
-  Note: One server can support multiple clients.
-    
 ### Local mode
 
 - Run blending demo in full simulation mode (simulated robot and sensor) 
@@ -85,8 +85,7 @@ Godel: Austrian logician and mathematician http://en.wikipedia.org/wiki/Kurt_G%C
   ```
   rosrun godel_network irb2400_client.sh [server ip] [robot namespace] true
   ```
-  Note:Robot namespace is the identity of individual robot, they can't be the same.
-  
+  Note: To support multiple Robots, the server can run multiple ros nodes in the blending application under a unique namespace.
   
   
 ### Calibration

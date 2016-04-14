@@ -18,7 +18,7 @@ const static std::string PROCESS_PATH_SERVICE = "process_path";
 const static std::string GET_AVAILABLE_MOTION_PLANS_SERVICE = "get_available_motion_plans";
 const static std::string SELECT_MOTION_PLAN_SERVICE = "select_motion_plan";
 const static std::string SURFACE_BLENDING_PARAMETERS = "surface_blending_parameters";
-const static int MAX_SERVICECALL_FAILURE = 20;
+const static int MAX_SERVICE_CALL_FAILURE = 20;
 
 int main(int argc, char** argv)
 {
@@ -27,14 +27,14 @@ int main(int argc, char** argv)
   ros::Rate loop_rate(10);
 
   godel_msgs::SurfaceBlendingParameters param_srv;
-  godel_msgs::SurfaceDetection surfaceDetection_srv;
-  godel_msgs::SelectSurface::Request selectSurface_req;
-  godel_msgs::SelectSurface::Response selectSurface_res;
+  godel_msgs::SurfaceDetection surface_detection_srv;
+  godel_msgs::SelectSurface::Request select_surface_req;
+  godel_msgs::SelectSurface::Response select_surface_res;
   godel_msgs::ProcessPlanning process_plan;
-  godel_msgs::GetAvailableMotionPlans motionQuery_srv;
+  godel_msgs::GetAvailableMotionPlans motion_query_srv;
   godel_msgs::SelectMotionPlan motion_srv;
   std::vector < std::string > plan_names;
-  int serviceCall_failure = 0;
+  int service_call_failure = 0;
 
   //ServiceClient
   ros::ServiceClient param_client = node_handle.serviceClient<godel_msgs::SurfaceBlendingParameters>(
@@ -51,9 +51,9 @@ int main(int argc, char** argv)
 
   while (ros::ok())
   {
-    if (serviceCall_failure > MAX_SERVICECALL_FAILURE)
+    if (service_call_failure > MAX_SERVICE_CALL_FAILURE)
     {
-      ROS_ERROR_STREAM("Service Call failures exceed the MAX_SERVICECALL_FAILURE");
+      ROS_ERROR_STREAM("Service Call failures exceed the MAX_SERVICE_CALL_FAILURE");
       return -1;
     }
 
@@ -62,28 +62,28 @@ int main(int argc, char** argv)
     if (!param_client.call(param_srv))
     {
       ROS_WARN_STREAM("Unable to call the "<<SURFACE_BLENDING_PARAMETERS<<" service");
-      serviceCall_failure++;
+      service_call_failure++;
       continue;
     }
 
     //Scan and detect surface
-    surfaceDetection_srv.request.action = 3;
-    surfaceDetection_srv.request.use_default_parameters = false;
-    surfaceDetection_srv.request.robot_scan = param_srv.response.robot_scan;
-    surfaceDetection_srv.request.surface_detection = param_srv.response.surface_detection;
-    if (!surface_client_.call(surfaceDetection_srv))
+    surface_detection_srv.request.action = 3;
+    surface_detection_srv.request.use_default_parameters = false;
+    surface_detection_srv.request.robot_scan = param_srv.response.robot_scan;
+    surface_detection_srv.request.surface_detection = param_srv.response.surface_detection;
+    if (!surface_client_.call(surface_detection_srv))
     {
       ROS_WARN_STREAM("Unable to call the "<<SURFACE_DETECTION_SERVICE<<" service");
-      serviceCall_failure++;
+      service_call_failure++;
       continue;
     }
 
     //Select all surface
-    selectSurface_req.action = selectSurface_req.SELECT_ALL;
-    if (!select_surface_client_.call(selectSurface_req, selectSurface_res))
+    select_surface_req.action = select_surface_req.SELECT_ALL;
+    if (!select_surface_client_.call(select_surface_req, select_surface_res))
     {
       ROS_WARN_STREAM("Unable to call the "<<SELECT_SURFACE_SERVICE<<" service");
-      serviceCall_failure++;
+      service_call_failure++;
       continue;
     }
 
@@ -95,17 +95,17 @@ int main(int argc, char** argv)
     if (!process_plan_client_.call(process_plan))
     {
       ROS_WARN_STREAM("Unable to call the "<<PROCESS_PATH_SERVICE<<" service");
-      serviceCall_failure++;
+      service_call_failure++;
       continue;
     }
 
-    if (!get_motion_plans_client_.call(motionQuery_srv))
+    if (!get_motion_plans_client_.call(motion_query_srv))
     {
       ROS_WARN_STREAM("Unable to call the "<<GET_AVAILABLE_MOTION_PLANS_SERVICE<<" service");
-      serviceCall_failure++;
+      service_call_failure++;
       continue;
     }
-    plan_names = motionQuery_srv.response.names;
+    plan_names = motion_query_srv.response.names;
 
     //Blending Simulation
     for (std::size_t i = 0; i < plan_names.size(); ++i)
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
       if (!sim_client_.call(motion_srv))
       {
         ROS_WARN_STREAM("Unable to call the "<<SELECT_MOTION_PLAN_SERVICE<<" service");
-        serviceCall_failure++;
+        service_call_failure++;
         continue;
       }
     }

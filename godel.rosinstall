@@ -2,7 +2,7 @@
     version: indigo-devel}
 - git: {local-name: godel_openvoronoi, uri: 'https://github.com/ros-industrial-consortium/godel_openvoronoi.git',
     version: hydro-devel}
-- git: {local-name: godel, uri: 'https://github.com/ros-industrial-consortium/godel.git',
+- git: {local-name: godel, uri: 'https://github.com/swri-robotics/godel.git',
     version: indigo-devel}
 - git: {local-name: motoman, uri: 'https://github.com/ros-industrial/motoman.git',
     version: indigo-devel}

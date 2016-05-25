@@ -5,7 +5,7 @@
   <xacro:include filename="$(find godel_robot_resources)/urdf/calib_kinect2_sensor_macro.xacro"/>
 
   <!-- parameter list -->
-  <xacro:property name="blend_tcp_x" value="-0.18415"/> 
+  <xacro:property name="blend_tcp_x" value="-0.1780"/>
   <xacro:property name="blend_tcp_y" value="-0.088502"/>
   <xacro:property name="blend_tcp_z" value="0.056356"/>
 
@@ -51,13 +51,13 @@
     </xacro:if>
     
     <xacro:unless value="${calibration}">
-      <xacro:kinect2_sensor_definitions prefix="${prefix}" parent_link="${prefix}kinect2_mount" 
-        x_val="-0.05490207720545535" 
-        y_val="-0.1108059263096891" 
-        z_val="-0.01737111616208457" 
-        roll="1.591199900154373" 
-        pitch="0.009672124637678808" 
-        yaw="-1.573233882247353"/>
+      <xacro:kinect2_sensor_definitions prefix="${prefix}" parent_link="${prefix}kinect2_mount"
+      x_val="-0.04655"
+      y_val="-0.11107"
+      z_val="-0.019356"
+      roll="1.58818"
+      pitch="0.0069"
+      yaw="-1.5725"/>
     </xacro:unless>
 
     <joint name="${prefix}gripper_to_keyence_optical" type="fixed">

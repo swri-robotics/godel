@@ -1,0 +1,11 @@
+Four msg files list below are parameters file for blending the surface in SwRi Lab, they need to be copied to the folder $HOME/.ros/.
+godel_surface_detection_parameters.msg
+godel_scan_parameters.msg
+godel_robot_scan_parameters.msg
+godel_blending_parameters.msg
+
+Four yaml files list bleow are calibration files for Kinect in SwRi Lab, they need to be copied to the folder `rospack find kinect2_bridge`/data/
+calib_color.yaml
+calib_depth.yaml
+calib_ir.yaml
+calib_pose.yaml
